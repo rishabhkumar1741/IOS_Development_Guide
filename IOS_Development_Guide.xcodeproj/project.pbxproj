@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		AC107C45304E900000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		55CCC279304E7BC1000ECC6A /* IOS_Development_Guide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IOS_Development_Guide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +33,7 @@
 		55CCC270304E7BC1000ECC6A = {
 			isa = PBXGroup;
 			children = (
+				AC107C45304E900000000001 /* README.md */,
 				55CCC27B304E7BC1000ECC6A /* IOS_Development_Guide */,
 				55CCC27A304E7BC1000ECC6A /* Products */,
 			);

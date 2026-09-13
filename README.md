@@ -43,6 +43,13 @@ Learning notes with explanations and examples. Use the topic index to jump to a 
 >   - [Return values](#return-values)
 >   - [Argument labels](#argument-labels)
 >   - [Default parameter values](#default-parameter-values)
+> - [Closures](#closures)
+>   - [Closure syntax and in](#closure-syntax-and-in)
+>   - [Passing a closure to a function](#passing-a-closure-to-a-function)
+>   - [Common closure mistakes](#common-closure-mistakes)
+>   - [Shorter closure syntax](#shorter-closure-syntax)
+>   - [Trailing closures](#trailing-closures)
+>   - [Capturing values](#capturing-values)
 
 ---
 
@@ -664,3 +671,114 @@ orderCoffee(size: "Large") // Coffee size: Large
 ```
 
 [Swift: Function declarations](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/declarations/#Function-Declaration)
+
+### Closures
+
+A **closure** is a block of code you can store or pass to a function. It can also capture values from its surrounding scope.
+
+#### Closure syntax and in
+
+```swift
+let add: (Int, Int) -> Int = { (x: Int, y: Int) -> Int in
+    return x + y
+}
+
+print(add(3, 4)) // 7
+```
+
+- `(Int, Int) -> Int`: takes two integers and returns an integer.
+- `{ ... }`: defines the closure expression.
+- `in`: separates the parameters and return type from the executable body.
+- `add(3, 4)`: runs the stored closure.
+
+#### Passing a closure to a function
+
+The caller supplies **how to calculate**; the function calls that calculation.
+
+```swift
+func studentMarksSum(
+    maths: Int,
+    science: Int,
+    total: (Int, Int) -> Int // Closure's return type
+) -> Int {                 // Function's return type
+    return total(maths, science)
+}
+
+let result = studentMarksSum(
+    maths: 50,
+    science: 50,
+    total: { (x: Int, y: Int) -> Int in
+        return x + y
+    }
+)
+
+print(result) // 100
+```
+
+**Flow:** `50, 50` → `total(50, 50)` → closure adds them → function returns `100`.
+
+Curly braces pass executable code as the `total` argument. Passing `50 + 50` would supply an `Int`, not the required closure. Here, the closure runs when `total(...)` is called.
+
+For fixed addition, directly returning `maths + science` is enough. A closure lets the caller choose the calculation.
+
+#### Common closure mistakes
+
+| Mistake | Fix |
+| --- | --- |
+| `total: (maths, science) -> Int` | Use types: `(Int, Int) -> Int`. |
+| `total(maths + science)` | Pass two arguments: `total(maths, science)`. |
+| Missing `-> Int` after the function's final `)` | Declare the function's result too; otherwise it returns `Void`. |
+
+The `-> Int` inside the parameter list belongs to `total`. The one **after** the list belongs to `studentMarksSum`.
+
+#### Shorter closure syntax
+
+Swift can infer types from context. A single-expression closure can omit `return`.
+
+```swift
+let shorterAdd: (Int, Int) -> Int = { x, y in x + y }
+let shortestAdd: (Int, Int) -> Int = { $0 + $1 }
+
+print(shorterAdd(3, 4))  // 7
+print(shortestAdd(3, 4)) // 7
+```
+
+`$0` and `$1` mean the first and second arguments. With these shorthand names, omit the explicit parameter list and `in`.
+
+#### Trailing closures
+
+When the last argument is a closure, you can write it **after the parentheses**. Using `studentMarksSum` from above:
+
+```swift
+let trailingResult = studentMarksSum(maths: 50, science: 50) { x, y in
+    x + y
+}
+
+print(trailingResult) // 100
+```
+
+This is the same calculation; the trailing closure supplies `total` without writing its label.
+
+[Swift: Closures](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/closures/)
+
+#### Capturing values
+
+A closure can keep access to a local variable after the surrounding function returns.
+
+```swift
+func makeCounter() -> () -> Int {
+    var count = 0
+    return {
+        count += 1
+        return count
+    }
+}
+
+let counter = makeCounter()
+print(counter()) // 1
+print(counter()) // 2
+```
+
+`makeCounter` returns a closure. That closure captures `count` and updates it on each call. `() -> Int` means no arguments and an integer result.
+
+[Swift: Functions and closures tour](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/guidedtour/#Functions-and-Closures)
